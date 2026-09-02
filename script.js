@@ -184,7 +184,7 @@ function renderCart() {
 
 function openProduct(id) {
   const p = getProduct(id);
-
+alert("¡El producto funciona!");
   if (!p) return;
 
   const modal = document.getElementById("productModal");
