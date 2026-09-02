@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Importadora El Rebajón - productos seleccionados con precios bajos y pago contra entrega.">
+  <title>Importadora El Rebajón | Compras fáciles y contra entrega</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="topbar">🚚 ENVÍOS A TODO COLOMBIA · 💵 PAGO CONTRA ENTREGA</div>
+
+  <header class="header">
+    <a class="brand" href="#inicio" aria-label="Importadora El Rebajón">
+      <span class="brand-mark">%</span>
+      <span>
+        <strong>IMPORTADORA</strong>
+        <b>EL REBAJÓN</b>
+        <small>PRECIOS BAJOS · GRANDES BENEFICIOS</small>
+      </span>
+    </a>
+    <nav>
+      <a href="#productos">Productos</a>
+      <a href="#como-comprar">Cómo comprar</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+    <button class="cart-button" id="openCart">🛒 Carrito <span id="cartCount">0</span></button>
+  </header>
+
+  <main id="inicio">
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">🔥 OFERTAS DE LA SEMANA</span>
+        <h1>Compra fácil.<br><span>Recibe en casa.</span></h1>
+        <p>Productos prácticos, llamativos y seleccionados para ti. Compra en línea y paga únicamente cuando recibas tu pedido.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#productos">VER PRODUCTOS</a>
+          <a class="btn secondary" href="https://www.facebook.com/share/19Upt9ivWr/?mibextid=wwXIfr" target="_blank" rel="noopener">VISITAR FACEBOOK</a>
+        </div>
+        <div class="trust">
+          <span>✓ Contra entrega</span><span>✓ Compra sin registro</span><span>✓ Atención por WhatsApp</span>
+        </div>
+      </div>
+      <div class="hero-card">
+        <img src="images/carro.jpg" alt="Carro de control remoto HD">
+        <div class="hero-price"><small>OFERTA</small><strong>$99.000</strong></div>
+      </div>
+    </section>
+
+    <section class="benefits">
+      <div><span>💵</span><strong>Pago contra entrega</strong><small>Pagas al recibir</small></div>
+      <div><span>📦</span><strong>Envíos nacionales</strong><small>Consulta cobertura</small></div>
+      <div><span>📲</span><strong>Pedido por WhatsApp</strong><small>Rápido y sencillo</small></div>
+      <div><span>⭐</span><strong>Productos seleccionados</strong><small>Calidad y utilidad</small></div>
+    </section>
+
+    <section class="section" id="productos">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">NUESTRO CATÁLOGO</span>
+          <h2>Productos que <span>sí quieres tener</span></h2>
+        </div>
+        <div class="search-wrap">
+          <input id="search" type="search" placeholder="Buscar producto...">
+        </div>
+      </div>
+      <div class="product-grid" id="productGrid"></div>
+    </section>
+
+    <section class="how" id="como-comprar">
+      <div>
+        <span class="eyebrow">ASÍ DE FÁCIL</span>
+        <h2>Compra en 3 pasos</h2>
+      </div>
+      <div class="steps">
+        <article><b>01</b><h3>Elige</h3><p>Agrega tus productos al carrito.</p></article>
+        <article><b>02</b><h3>Completa tus datos</h3><p>Nombre, teléfono y dirección de entrega.</p></article>
+        <article><b>03</b><h3>Confirma por WhatsApp</h3><p>Recibimos tu pedido y coordinamos el envío contra entrega.</p></article>
+      </div>
+    </section>
+
+    <section class="cta" id="contacto">
+      <div>
+        <span class="eyebrow">¿TIENES UNA DUDA?</span>
+        <h2>Habla directamente con nosotros.</h2>
+        <p>Escríbenos por WhatsApp y te ayudamos con disponibilidad, cobertura y pedidos.</p>
+      </div>
+      <a class="btn primary" href="https://wa.me/573147636825?text=Hola%20Importadora%20El%20Rebaj%C3%B3n%2C%20quiero%20informaci%C3%B3n%20sobre%20un%20producto." target="_blank" rel="noopener">WHATSAPP</a>
+    </section>
+  </main>
+
+  <footer>
+    <div>
+      <strong>IMPORTADORA EL REBAJÓN</strong>
+      <p>Precios bajos · Grandes beneficios</p>
+    </div>
+    <div class="footer-links">
+      <a href="https://www.facebook.com/share/19Upt9ivWr/?mibextid=wwXIfr" target="_blank" rel="noopener">Facebook</a>
+      <a href="https://wa.me/573147636825" target="_blank" rel="noopener">WhatsApp</a>
+    </div>
+    <small>© 2026 Importadora El Rebajón</small>
+  </footer>
+
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="cart-drawer" id="cartDrawer" aria-label="Carrito de compras">
+    <div class="drawer-head"><h2>Tu carrito</h2><button id="closeCart" aria-label="Cerrar">×</button></div>
+    <div id="cartItems" class="cart-items"></div>
+    <div class="cart-total"><span>Total</span><strong id="cartTotal">$0</strong></div>
+    <button class="btn primary full" id="checkoutBtn">FINALIZAR PEDIDO</button>
+    <p class="mini-note">💵 Pago exclusivamente contra entrega.</p>
+  </aside>
+
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal">
+      <button class="modal-close" id="closeModal">×</button>
+      <span class="eyebrow">FINALIZAR PEDIDO</span>
+      <h2>Datos de entrega</h2>
+      <p class="modal-intro">Completa tus datos. El pedido se enviará a nuestro WhatsApp.</p>
+      <form id="orderForm">
+        <label>Nombre completo<input required name="name" autocomplete="name" placeholder="Ej. Juan Pérez"></label>
+        <label>Teléfono<input required name="phone" inputmode="tel" autocomplete="tel" placeholder="Ej. 3001234567"></label>
+        <div class="two">
+          <label>Departamento<input required name="department" placeholder="Ej. Caldas"></label>
+          <label>Ciudad<input required name="city" placeholder="Ej. La Dorada"></label>
+        </div>
+        <label>Dirección<input required name="address" autocomplete="street-address" placeholder="Carrera, calle, número..."></label>
+        <label>Barrio<input name="neighborhood" placeholder="Barrio"></label>
+        <label>Observaciones<textarea name="notes" rows="3" placeholder="Referencia o indicaciones de entrega"></textarea></label>
+        <div class="payment">💵 <strong>Pago contra entrega</strong><span>No necesitas pagar en línea.</span></div>
+        <button class="btn primary full" type="submit">CONFIRMAR PEDIDO POR WHATSAPP</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
