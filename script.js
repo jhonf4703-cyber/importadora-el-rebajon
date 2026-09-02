@@ -31,10 +31,10 @@ const products = [
   {
     id: "instax",
     name: "Fujifilm Instax Mini 12",
-    price: 0,
-    oldPrice: null,
+    price: 285000,
+    oldPrice: 395000,
     image: "images/instax.jpg",
-    tag: "CONSULTAR",
+    tag: "TOP VENTAS",
     description: "Cámara instantánea compacta para guardar tus momentos en formato físico."
   }
 ];
@@ -82,7 +82,7 @@ function renderProducts(list = products){
   }
 
   grid.innerHTML = list.map(p => `
-    <article class="product" onclick="openProduct('${p.id}')">
+    <article class="product">
       <img src="${p.image}" alt="${p.name}">
       <div class="product-body">
         <span class="tag">${p.tag}</span>
@@ -94,7 +94,7 @@ function renderProducts(list = products){
           ${money(p.price)}
         </div>
 
-        <button class="btn primary" onclick="event.stopPropagation(); addToCart('${p.id}')">
+        <button class="btn primary" onclick="addToCart('${p.id}')">
           ${p.price ? "AÑADIR AL CARRITO" : "CONSULTAR POR WHATSAPP"}
         </button>
       </div>
