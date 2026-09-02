@@ -1,3 +1,4 @@
+
 const WHATSAPP = "573147636825";
 
 const products = [
@@ -42,51 +43,81 @@ const products = [
 let cart = JSON.parse(localStorage.getItem("rebajon_cart") || "[]");
 
 const money = n => n ? "$" + n.toLocaleString("es-CO") : "Consultar";
+
 const getProduct = id => products.find(p => p.id === id);
 
-function saveCart(){ localStorage.setItem("rebajon_cart", JSON.stringify(cart)); renderCart(); }
+function saveCart() {
+  localStorage.setItem("rebajon_cart", JSON.stringify(cart));
+  renderCart();
+}
 
-function addToCart(id){
+function addToCart(id) {
   const p = getProduct(id);
-  if(!p.price){ openWhatsApp(`Hola Importadora El Rebajón, quiero consultar el precio de ${p.name}.`); return; }
+
+  if (!p) return;
+
+  if (!p.price) {
+    openWhatsApp(`Hola Importadora El Rebajón, quiero consultar el precio de ${p.name}.`);
+    return;
+  }
+
   const item = cart.find(x => x.id === id);
-  if(item) item.qty++;
-  else cart.push({id, qty:1});
+
+  if (item) {
+    item.qty++;
+  } else {
+    cart.push({ id, qty: 1 });
+  }
+
   saveCart();
   openCart();
 }
 
-function changeQty(id, delta){
+function changeQty(id, delta) {
   const item = cart.find(x => x.id === id);
-  if(!item) return;
+
+  if (!item) return;
+
   item.qty += delta;
-  if(item.qty <= 0) cart = cart.filter(x => x.id !== id);
+
+  if (item.qty <= 0) {
+    cart = cart.filter(x => x.id !== id);
+  }
+
   saveCart();
 }
 
-function removeItem(id){ cart = cart.filter(x => x.id !== id); saveCart(); }
+function removeItem(id) {
+  cart = cart.filter(x => x.id !== id);
+  saveCart();
+}
 
-function total(){
+function total() {
   return cart.reduce((sum, item) => {
     const p = getProduct(item.id);
-    return sum + (p.price * item.qty);
+    return sum + (p ? p.price * item.qty : 0);
   }, 0);
 }
 
-function renderProducts(list = products){
+function renderProducts(list = products) {
   const grid = document.getElementById("productGrid");
 
-  if(!list.length){
+  if (!grid) return;
+
+  if (!list.length) {
     grid.innerHTML = '<div class="empty">No encontramos productos con esa búsqueda.</div>';
     return;
   }
 
   grid.innerHTML = list.map(p => `
-    <article class="product">
+    <article class="product" onclick="openProduct('${p.id}')">
       <img src="${p.image}" alt="${p.name}">
+      
       <div class="product-body">
         <span class="tag">${p.tag}</span>
+
         <h3>${p.name}</h3>
+
         <p>${p.description}</p>
 
         <div class="price">
@@ -94,7 +125,9 @@ function renderProducts(list = products){
           ${money(p.price)}
         </div>
 
-        <button class="btn primary" onclick="addToCart('${p.id}')">
+        <button 
+          class="btn primary" 
+          onclick="event.stopPropagation(); addToCart('${p.id}')">
           ${p.price ? "AÑADIR AL CARRITO" : "CONSULTAR POR WHATSAPP"}
         </button>
       </div>
@@ -102,48 +135,74 @@ function renderProducts(list = products){
   `).join("");
 }
 
-function renderCart(){
-  document.getElementById("cartCount").textContent = cart.reduce((s,x)=>s+x.qty,0);
+function renderCart() {
+  const cartCount = document.getElementById("cartCount");
   const box = document.getElementById("cartItems");
-  if(!cart.length){
+  const cartTotal = document.getElementById("cartTotal");
+  const checkoutBtn = document.getElementById("checkoutBtn");
+
+  if (!cartCount || !box || !cartTotal || !checkoutBtn) return;
+
+  cartCount.textContent = cart.reduce((s, x) => s + x.qty, 0);
+
+  if (!cart.length) {
     box.innerHTML = '<div class="empty">Tu carrito está vacío.<br><br>Agrega un producto para comenzar.</div>';
   } else {
     box.innerHTML = cart.map(item => {
       const p = getProduct(item.id);
-      return `<div class="cart-row">
-        <img src="${p.image}" alt="${p.name}">
-        <div>
-          <h4>${p.name}</h4>
-          <small>${money(p.price)} c/u</small>
-          <div class="qty">
-            <button onclick="changeQty('${p.id}',-1)">−</button>
-            <b>${item.qty}</b>
-            <button onclick="changeQty('${p.id}',1)">+</button>
-            <button class="remove" onclick="removeItem('${p.id}')">Eliminar</button>
+
+      if (!p) return "";
+
+      return `
+        <div class="cart-row">
+          <img src="${p.image}" alt="${p.name}">
+
+          <div>
+            <h4>${p.name}</h4>
+            <small>${money(p.price)} c/u</small>
+
+            <div class="qty">
+              <button onclick="changeQty('${p.id}',-1)">−</button>
+              <b>${item.qty}</b>
+              <button onclick="changeQty('${p.id}',1)">+</button>
+              <button class="remove" onclick="removeItem('${p.id}')">
+                Eliminar
+              </button>
+            </div>
           </div>
+
+          <strong>${money(p.price * item.qty)}</strong>
         </div>
-        <strong>${money(p.price * item.qty)}</strong>
-      </div>`;
+      `;
     }).join("");
   }
-  document.getElementById("cartTotal").textContent = money(total());
-  document.getElementById("checkoutBtn").disabled = cart.length === 0;
-  document.getElementById("checkoutBtn").style.opacity = cart.length ? "1" : ".45";
-}
-function openProduct(id){
-  const p = getProduct(id);
-  if(!p) return;
 
+  cartTotal.textContent = money(total());
+  checkoutBtn.disabled = cart.length === 0;
+  checkoutBtn.style.opacity = cart.length ? "1" : ".45";
+}
+
+function openProduct(id) {
+  const p = getProduct(id);
+
+  if (!p) return;
+
+  const modal = document.getElementById("productModal");
   const detail = document.getElementById("productDetail");
+
+  if (!modal || !detail) return;
 
   detail.innerHTML = `
     <div class="product-detail">
+
       <div class="product-detail-image">
         <img src="${p.image}" alt="${p.name}">
       </div>
 
       <div class="product-detail-info">
+
         <span class="tag">${p.tag}</span>
+
         <h2>${p.name}</h2>
 
         <div class="price">
@@ -153,77 +212,168 @@ function openProduct(id){
 
         <p>${p.description}</p>
 
-        <button class="btn primary full" onclick="addToCart('${p.id}'); closeProduct();">
+        <button 
+          class="btn primary full"
+          onclick="addToCart('${p.id}'); closeProduct();">
           ${p.price ? "AÑADIR AL CARRITO" : "CONSULTAR POR WHATSAPP"}
         </button>
+
       </div>
+
     </div>
   `;
 
-  document.getElementById("productModal").classList.add("show");
+  modal.classList.add("show");
 }
 
-function closeProduct(){
-  document.getElementById("productModal").classList.remove("show");
-}
+function closeProduct() {
+  const modal = document.getElementById("productModal");
 
-document.getElementById("closeProductModal").onclick = closeProduct;
-
-document.getElementById("productModal").addEventListener("click", e => {
-  if(e.target.id === "productModal"){
-    closeProduct();
+  if (modal) {
+    modal.classList.remove("show");
   }
-});
-function openCart(){
-  document.getElementById("cartDrawer").classList.add("open");
-  document.getElementById("drawerBackdrop").classList.add("show");
 }
-function closeCart(){
-  document.getElementById("cartDrawer").classList.remove("open");
-  document.getElementById("drawerBackdrop").classList.remove("show");
+
+function openCart() {
+  const drawer = document.getElementById("cartDrawer");
+  const backdrop = document.getElementById("drawerBackdrop");
+
+  if (drawer) drawer.classList.add("open");
+  if (backdrop) backdrop.classList.add("show");
 }
-function openWhatsApp(text){ window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`, "_blank"); }
 
-document.getElementById("openCart").onclick = openCart;
-document.getElementById("closeCart").onclick = closeCart;
-document.getElementById("drawerBackdrop").onclick = closeCart;
+function closeCart() {
+  const drawer = document.getElementById("cartDrawer");
+  const backdrop = document.getElementById("drawerBackdrop");
 
-document.getElementById("checkoutBtn").onclick = () => {
-  if(!cart.length) return;
-  document.getElementById("modalBackdrop").classList.add("show");
-  closeCart();
-};
-document.getElementById("closeModal").onclick = () => document.getElementById("modalBackdrop").classList.remove("show");
+  if (drawer) drawer.classList.remove("open");
+  if (backdrop) backdrop.classList.remove("show");
+}
 
-document.getElementById("orderForm").addEventListener("submit", e => {
-  e.preventDefault();
-  const data = new FormData(e.target);
-  const lines = cart.map(item => {
-    const p = getProduct(item.id);
-    return `• ${item.qty} x ${p.name} — ${money(p.price * item.qty)}`;
-  }).join("\n");
-  const message = `🛒 *NUEVO PEDIDO - IMPORTADORA EL REBAJÓN*\n\n` +
-    `👤 Cliente: ${data.get("name")}\n` +
-    `📱 Teléfono: ${data.get("phone")}\n` +
-    `📍 Departamento: ${data.get("department")}\n` +
-    `🏙️ Ciudad: ${data.get("city")}\n` +
-    `🏠 Dirección: ${data.get("address")}\n` +
-    `🏘️ Barrio: ${data.get("neighborhood") || "No indicado"}\n\n` +
-    `📦 *PRODUCTOS:*\n${lines}\n\n` +
-    `💰 *TOTAL: ${money(total())}*\n` +
-    `💵 *PAGO: CONTRA ENTREGA*\n` +
-    `📝 Observaciones: ${data.get("notes") || "Ninguna"}`;
-  openWhatsApp(message);
-  cart = [];
-  saveCart();
-  document.getElementById("modalBackdrop").classList.remove("show");
-  e.target.reset();
+function openWhatsApp(text) {
+  window.open(
+    `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`,
+    "_blank"
+  );
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const openCartBtn = document.getElementById("openCart");
+  const closeCartBtn = document.getElementById("closeCart");
+  const drawerBackdrop = document.getElementById("drawerBackdrop");
+
+  const checkoutBtn = document.getElementById("checkoutBtn");
+  const closeModalBtn = document.getElementById("closeModal");
+
+  const closeProductModal = document.getElementById("closeProductModal");
+  const productModal = document.getElementById("productModal");
+
+  const search = document.getElementById("search");
+  const orderForm = document.getElementById("orderForm");
+
+  if (openCartBtn) {
+    openCartBtn.onclick = openCart;
+  }
+
+  if (closeCartBtn) {
+    closeCartBtn.onclick = closeCart;
+  }
+
+  if (drawerBackdrop) {
+    drawerBackdrop.onclick = closeCart;
+  }
+
+  if (checkoutBtn) {
+    checkoutBtn.onclick = () => {
+      if (!cart.length) return;
+
+      const modalBackdrop = document.getElementById("modalBackdrop");
+
+      if (modalBackdrop) {
+        modalBackdrop.classList.add("show");
+      }
+
+      closeCart();
+    };
+  }
+
+  if (closeModalBtn) {
+    closeModalBtn.onclick = () => {
+      const modalBackdrop = document.getElementById("modalBackdrop");
+
+      if (modalBackdrop) {
+        modalBackdrop.classList.remove("show");
+      }
+    };
+  }
+
+  if (closeProductModal) {
+    closeProductModal.onclick = closeProduct;
+  }
+
+  if (productModal) {
+    productModal.addEventListener("click", e => {
+      if (e.target === productModal) {
+        closeProduct();
+      }
+    });
+  }
+
+  if (search) {
+    search.addEventListener("input", e => {
+      const q = e.target.value.toLowerCase().trim();
+
+      renderProducts(
+        products.filter(p =>
+          `${p.name} ${p.description} ${p.tag}`
+            .toLowerCase()
+            .includes(q)
+        )
+      );
+    });
+  }
+
+  if (orderForm) {
+    orderForm.addEventListener("submit", e => {
+      e.preventDefault();
+
+      const data = new FormData(e.target);
+
+      const lines = cart.map(item => {
+        const p = getProduct(item.id);
+
+        return `• ${item.qty} x ${p.name} — ${money(p.price * item.qty)}`;
+      }).join("\n");
+
+      const message =
+        `🛒 *NUEVO PEDIDO - IMPORTADORA EL REBAJÓN*\n\n` +
+        `👤 Cliente: ${data.get("name")}\n` +
+        `📱 Teléfono: ${data.get("phone")}\n` +
+        `📍 Departamento: ${data.get("department")}\n` +
+        `🏙️ Ciudad: ${data.get("city")}\n` +
+        `🏠 Dirección: ${data.get("address")}\n` +
+        `🏘️ Barrio: ${data.get("neighborhood") || "No indicado"}\n\n` +
+        `📦 *PRODUCTOS:*\n${lines}\n\n` +
+        `💰 *TOTAL: ${money(total())}*\n` +
+        `💵 *PAGO: CONTRA ENTREGA*\n` +
+        `📝 Observaciones: ${data.get("notes") || "Ninguna"}`;
+
+      openWhatsApp(message);
+
+      cart = [];
+      saveCart();
+
+      const modalBackdrop = document.getElementById("modalBackdrop");
+
+      if (modalBackdrop) {
+        modalBackdrop.classList.remove("show");
+      }
+
+      e.target.reset();
+    });
+  }
+
+  renderProducts();
+  renderCart();
 });
-
-document.getElementById("search").addEventListener("input", e => {
-  const q = e.target.value.toLowerCase().trim();
-  renderProducts(products.filter(p => `${p.name} ${p.description} ${p.tag}`.toLowerCase().includes(q)));
-});
-
-renderProducts();
-renderCart();
