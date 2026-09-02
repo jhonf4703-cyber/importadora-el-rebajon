@@ -75,16 +75,28 @@ function total(){
 
 function renderProducts(list = products){
   const grid = document.getElementById("productGrid");
-  if(!list.length){ grid.innerHTML = '<div class="empty">No encontramos productos con esa búsqueda.</div>'; return; }
+
+  if(!list.length){
+    grid.innerHTML = '<div class="empty">No encontramos productos con esa búsqueda.</div>';
+    return;
+  }
+
   grid.innerHTML = list.map(p => `
-    <article class="product">
+    <article class="product" onclick="openProduct('${p.id}')">
       <img src="${p.image}" alt="${p.name}">
       <div class="product-body">
         <span class="tag">${p.tag}</span>
         <h3>${p.name}</h3>
         <p>${p.description}</p>
-        <div class="price">${p.oldPrice ? `<span class="old">${money(p.oldPrice)}</span>` : ""}${money(p.price)}</div>
-        <button class="btn primary" onclick="addToCart('${p.id}')">${p.price ? "AÑADIR AL CARRITO" : "CONSULTAR POR WHATSAPP"}</button>
+
+        <div class="price">
+          ${p.oldPrice ? `<span class="old">${money(p.oldPrice)}</span>` : ""}
+          ${money(p.price)}
+        </div>
+
+        <button class="btn primary" onclick="event.stopPropagation(); addToCart('${p.id}')">
+          ${p.price ? "AÑADIR AL CARRITO" : "CONSULTAR POR WHATSAPP"}
+        </button>
       </div>
     </article>
   `).join("");
@@ -118,7 +130,50 @@ function renderCart(){
   document.getElementById("checkoutBtn").disabled = cart.length === 0;
   document.getElementById("checkoutBtn").style.opacity = cart.length ? "1" : ".45";
 }
+function openProduct(id){
+  const p = getProduct(id);
+  if(!p) return;
 
+  const detail = document.getElementById("productDetail");
+
+  detail.innerHTML = `
+    <div class="product-detail">
+      <div class="product-detail-image">
+        <img src="${p.image}" alt="${p.name}">
+      </div>
+
+      <div class="product-detail-info">
+        <span class="tag">${p.tag}</span>
+        <h2>${p.name}</h2>
+
+        <div class="price">
+          ${p.oldPrice ? `<span class="old">${money(p.oldPrice)}</span>` : ""}
+          ${money(p.price)}
+        </div>
+
+        <p>${p.description}</p>
+
+        <button class="btn primary full" onclick="addToCart('${p.id}'); closeProduct();">
+          ${p.price ? "AÑADIR AL CARRITO" : "CONSULTAR POR WHATSAPP"}
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("productModal").classList.add("show");
+}
+
+function closeProduct(){
+  document.getElementById("productModal").classList.remove("show");
+}
+
+document.getElementById("closeProductModal").onclick = closeProduct;
+
+document.getElementById("productModal").addEventListener("click", e => {
+  if(e.target.id === "productModal"){
+    closeProduct();
+  }
+});
 function openCart(){
   document.getElementById("cartDrawer").classList.add("open");
   document.getElementById("drawerBackdrop").classList.add("show");
